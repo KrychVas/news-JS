@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
         <meta name="theme-color" content="#0d0f14" />
+        <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
         <meta
             name="description"
-            content="News Portal — адаптивна стрічка новин з понад сотні світових джерел, зібрана через News API."
+            content="News Portal — an adaptive news feed from hundreds of sources worldwide, powered by News API."
         />
-        <title>News Portal — стрічка новин</title>
+        <title>News Portal — world news feed</title>
     </head>
     <body>
         <div class="app">
@@ -18,25 +19,25 @@
                     <a class="brand" href="./">
                         <span class="brand__mark" aria-hidden="true">N</span>
                         <span class="brand__name">News<span class="brand__accent">Portal</span></span>
-                        <span class="header__badge" hidden>Демо-дані</span>
+                        <span class="header__badge" hidden>Demo data</span>
                     </a>
-                    <p class="header__tagline">Стрічка новин з усього світу</p>
+                    <p class="header__tagline">News from around the world</p>
                 </div>
             </header>
 
             <main class="main">
                 <section class="sources-panel" aria-labelledby="sourcesTitle">
-                    <h2 class="panel__title" id="sourcesTitle">Джерела</h2>
-                    <div class="sources" role="group" aria-label="Список джерел новин"></div>
+                    <h2 class="panel__title" id="sourcesTitle">Sources</h2>
+                    <div class="sources" role="group" aria-label="News sources"></div>
                 </section>
 
                 <section class="news-panel" aria-labelledby="newsTitle">
-                    <h2 class="panel__title" id="newsTitle">Останні новини</h2>
+                    <h2 class="panel__title" id="newsTitle">Latest news</h2>
                     <div class="news" aria-live="polite"></div>
                 </section>
 
                 <noscript class="noscript">
-                    Для роботи застосунку потрібно увімкнути JavaScript у браузері.
+                    This application requires JavaScript to be enabled in your browser.
                 </noscript>
             </main>
 
@@ -105,7 +106,7 @@
                     <h3 class="news__description-title"></h3>
                     <p class="news__description-content"></p>
                     <a class="news__read-more" href="#" target="_blank" rel="noopener noreferrer">
-                        Читати далі
+                        Read more
                         <span class="news__read-more-arrow" aria-hidden="true">→</span>
                     </a>
                 </div>

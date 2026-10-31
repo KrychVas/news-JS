@@ -1,5 +1,5 @@
 import './news.css';
-import type { IArticle } from '../../../types/api';
+import type { IArticle, Maybe } from '../../../types/api';
 import { cloneTemplate, getElement } from '../../../utils/dom';
 import { formatPublishDate } from '../../../utils/format';
 
@@ -50,7 +50,7 @@ class News {
 
         const title: HTMLParagraphElement = document.createElement('p');
         title.className = 'news__status-title';
-        title.textContent = 'Не вдалося завантажити новини';
+        title.textContent = 'Could not load the news';
 
         const details: HTMLParagraphElement = document.createElement('p');
         details.className = 'news__status-details';
@@ -59,7 +59,7 @@ class News {
         const retry: HTMLButtonElement = document.createElement('button');
         retry.className = 'news__retry';
         retry.type = 'button';
-        retry.textContent = 'Спробувати ще раз';
+        retry.textContent = 'Try again';
 
         wrapper.append(title, details, retry);
         this.container.replaceChildren(wrapper);
@@ -69,17 +69,13 @@ class News {
         const fragment: DocumentFragment = cloneTemplate(News.CARD_TEMPLATE_ID);
         const photo: HTMLElement = getElement<HTMLElement>('.news__photo', fragment);
 
-        if (article.urlToImage === null || article.urlToImage === '') {
-            photo.classList.add(PLACEHOLDER_CLASS);
-        } else {
-            photo.style.backgroundImage = `url("${article.urlToImage}")`;
-        }
+        News.applyPhoto(photo, article.urlToImage);
 
         getElement<HTMLElement>('.news__meta-author', fragment).textContent = article.author ?? article.source.name;
         getElement<HTMLElement>('.news__description-title', fragment).textContent = article.title;
         getElement<HTMLElement>('.news__description-source', fragment).textContent = article.source.name;
         getElement<HTMLElement>('.news__description-content', fragment).textContent =
-            article.description ?? 'Опис для цієї новини недоступний.';
+            article.description ?? 'No description available for this article.';
 
         const date: HTMLTimeElement = getElement<HTMLTimeElement>('.news__meta-date', fragment);
         date.textContent = formatPublishDate(article.publishedAt);
@@ -94,13 +90,38 @@ class News {
     private fillReadMoreLink(article: Pick<IArticle, 'url' | 'title'>, fragment: DocumentFragment): void {
         const link: HTMLAnchorElement = getElement<HTMLAnchorElement>('.news__read-more', fragment);
         link.href = article.url;
-        link.setAttribute('aria-label', `Читати далі: ${article.title}`);
+        link.setAttribute('aria-label', `Read more: ${article.title}`);
+    }
+
+    /**
+     * Loads the cover image first, so a missing, broken or blocked url falls
+     * back to the CSS placeholder instead of an empty box. `Maybe<string>` is a
+     * union type: `string | null`.
+     */
+    private static applyPhoto(photo: HTMLElement, url: Maybe<string>): void {
+        if (url === null || url === '') {
+            photo.classList.add(PLACEHOLDER_CLASS);
+
+            return;
+        }
+
+        const image: HTMLImageElement = new Image();
+
+        image.addEventListener('load', () => {
+            photo.style.backgroundImage = `url("${url}")`;
+        });
+
+        image.addEventListener('error', () => {
+            photo.classList.add(PLACEHOLDER_CLASS);
+        });
+
+        image.src = url;
     }
 
     private renderEmptyState(): void {
         const empty: HTMLParagraphElement = document.createElement('p');
         empty.className = 'news__status';
-        empty.textContent = 'Для цього джерела новин поки немає.';
+        empty.textContent = 'No news for this source yet.';
 
         this.container.replaceChildren(empty);
     }

@@ -6,8 +6,8 @@ import { Endpoint, HttpMethod } from '../../types/api';
  * how to turn every failure into a human readable message.
  */
 class Loader {
-    private static readonly UNAUTHORIZED_MESSAGE = 'Сервер відхилив запит: перевірте API-ключ.';
-    private static readonly NOT_FOUND_MESSAGE = 'Ресурс не знайдено на сервері News API.';
+    private static readonly UNAUTHORIZED_MESSAGE = 'The server rejected the request: check your API key.';
+    private static readonly NOT_FOUND_MESSAGE = 'The requested resource was not found on the News API server.';
 
     private readonly baseUrl: string;
     private readonly defaultQuery: Readonly<QueryParams>;
@@ -78,7 +78,7 @@ class Loader {
             throw new Error(Loader.NOT_FOUND_MESSAGE);
         }
 
-        throw new Error(`Запит завершився помилкою ${response.status} ${response.statusText}`.trim());
+        throw new Error(`Request failed with status ${response.status} ${response.statusText}`.trim());
     }
 
     private static describeError(error: unknown): string {

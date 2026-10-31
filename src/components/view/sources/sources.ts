@@ -22,7 +22,7 @@ class Sources {
     }
 
     public showLoading(): void {
-        this.container.replaceChildren(this.createStatus('Завантаження джерел…'));
+        this.container.replaceChildren(this.createStatus('Loading sources…'));
     }
 
     public showError(message: string): void {

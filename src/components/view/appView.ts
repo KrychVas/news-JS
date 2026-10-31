@@ -50,7 +50,7 @@ export class AppView {
 
         const badge: HTMLElement = getElement<HTMLElement>('.header__badge');
         badge.hidden = false;
-        badge.textContent = 'Демо-дані';
+        badge.textContent = 'Demo data';
     }
 }
 
