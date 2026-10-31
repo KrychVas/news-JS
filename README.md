@@ -1,20 +1,21 @@
 # News Portal (news-JS)
 
-SPA-застосунок для перегляду новин з понад сотні світових джерел через
-[News API](https://newsapi.org/). Проєкт мігровано з JavaScript на TypeScript,
-додано власний адаптивний дизайн (320px – 1920px).
+A single page application that shows news from more than a hundred sources
+around the world through [News API](https://newsapi.org/). The project was
+migrated from JavaScript to TypeScript and comes with a custom adaptive design
+that works from 320px up to 1920px.
 
-## Стек
+## Stack
 
-| Шар         | Технології                              |
-| ----------- | --------------------------------------- |
-| Мова        | TypeScript (`strict`, `noImplicitAny`)   |
-| Збірка      | Webpack 5 + `ts-loader`                  |
-| Лінтування  | ESLint 8 + `@typescript-eslint` + Prettier |
-| Стилі       | CSS (без фреймворків), mobile-first     |
-| Запити      | `fetch` з типізованою обгорткою `Loader` |
+| Layer      | Tools                                     |
+| ---------- | ----------------------------------------- |
+| Language   | TypeScript (`strict`, `noImplicitAny`)    |
+| Bundler    | Webpack 5 + `ts-loader`                   |
+| Linting    | ESLint 8 + `@typescript-eslint` + Prettier |
+| Styling    | Plain CSS, mobile first                   |
+| Networking | `fetch` behind a typed `Loader` class     |
 
-## Швидкий старт
+## Quick start
 
 ```bash
 npm install
@@ -22,94 +23,95 @@ cp .env.example .env   # Windows: copy .env.example .env
 npm start              # http://localhost:8080
 ```
 
-## Скрипти
+## Scripts
 
-| Скрипт               | Що робить                                              |
-| -------------------- | ------------------------------------------------------ |
-| `npm start`          | dev-сервер webpack з гарячим перезавантаженням         |
-| `npm run build`      | production-збірка в `dist/` (для gh-pages)             |
-| `npm run typecheck`  | `tsc --noEmit`, перевірка типів без генерації файлів   |
-| `npm run lint`       | ESLint для `*.ts` (правило `no-explicit-any` увімкнено) |
-| `npm run lint:fix`   | ESLint з автоматичним виправленням                     |
-| `npm run prettier`   | перевірка форматування                                 |
+| Script              | Description                                         |
+| ------------------- | --------------------------------------------------- |
+| `npm start`         | Webpack dev server with hot reload                  |
+| `npm run build`     | Production build into `dist/` (used for gh-pages)    |
+| `npm run typecheck` | `tsc --noEmit`, type checking without emitting files |
+| `npm run lint`      | ESLint for `*.ts`, `no-explicit-any` is an error     |
+| `npm run lint:fix`  | ESLint with automatic fixes                          |
+| `npm run prettier`  | Formatting check                                     |
 
-## Змінні середовища
+## Environment variables
 
-| Змінна          | Призначення                                                                    |
+| Variable        | Purpose                                                                        |
 | --------------- | ------------------------------------------------------------------------------ |
-| `API_URL`       | Базова адреса API. За замовчуванням CORS-проксі `https://rss-news-api.onrender.com/` |
-| `API_KEY`       | Особистий ключ News API. Порожній, якщо використовується проксі                 |
-| `API_USE_MOCKS` | `true` — статичні `/mocks/*` ендпоінти (не витрачає ліміт ключа), `false` — живі дані |
+| `API_URL`       | API base url, defaults to the CORS proxy `https://rss-news-api.onrender.com/`   |
+| `API_KEY`       | Personal News API key, required only for the live endpoints                     |
+| `API_USE_MOCKS` | `true` — static `/mocks/*` endpoints, `false` — live proxied News API           |
 
-`dotenv-webpack` читає `.env`, а відсутні змінні добирає з закоміченого
-`.env.defaults`, тому збірка не падає без локального `.env`.
+`dotenv-webpack` reads `.env` and takes missing values from the committed
+`.env.defaults`, so a build never fails without a local `.env`.
 
-### Мок-ендпоінти
+### Mock endpoints
 
-Проксі має додаткові ендпоінти зі статичними даними:
+The proxy exposes two extra endpoints with static data:
 
-- `GET /mocks/sources` — фіксований список джерел;
-- `GET /mocks/everything` — фіксований список статей.
+- `GET /mocks/sources` — a fixed list of sources;
+- `GET /mocks/everything` — a fixed list of articles.
 
-Для розробки достатньо `API_USE_MOCKS=true` (це значення за замовчуванням у
-`.env.defaults`). Бейдж **Демо-дані** в хедері показує, що застосунок працює на моках.
+`API_USE_MOCKS=true` is the default: it needs no API key and never consumes the
+request limit. The **Demo data** badge in the header tells you which mode is
+active.
 
-> **Чому демо задеплоєне на моках.** Живі ендпоінти проксі (`/sources`,
-> `/everything`) без особистого ключа повертають `401 Unauthorized`, а моки —
-> `200` з `Access-Control-Allow-Origin: *`. Щоб побачити справжні новини,
-> впишіть свій ключ у `API_KEY` і встановіть `API_USE_MOCKS=false`.
+> **Why the deployed demo runs on mocks.** The live proxy endpoints (`/sources`,
+> `/everything`) answer `401 Unauthorized` without a personal key, while the
+> mocks answer `200` with `Access-Control-Allow-Origin: *`. To see real news,
+> put your key into `API_KEY` and set `API_USE_MOCKS=false`.
 
-## Що є в TypeScript
+## TypeScript highlights
 
 - `enum` — `Endpoint`, `HttpMethod`, `ResponseStatus`, `ApiMode` (`src/types/api.ts`);
-- інтерфейси API — `ISource`, `IArticle`, `ISourcesResponse`, `IArticlesResponse`;
-- універсальні типи — `Callback<TData>`, `ErrorCallback`, `Maybe<TValue>`;
-- union-тип `NewsApiResponse` = `ISourcesResponse | IArticlesResponse`;
-- generics — `Loader.getResp<TResponse>()` і `Loader.request<TResponse>()`;
-- utility-типи — `Partial<QueryParams>`, `Pick<IArticle, 'url' | 'title'>`, `Readonly<ILoaderOptions>`;
-- класи з `private`/`public` модифікаторами — `Loader`, `AppLoader`, `AppController`, `AppView`, `News`, `Sources`, `App`;
-- жодного `any`: відповідь `fetch` типізується як `unknown` і звужується до `TResponse`.
+- API interfaces — `ISource`, `IArticle`, `ISourcesResponse`, `IArticlesResponse`;
+- reusable function types — `Callback<TData>`, `ErrorCallback`, `Maybe<TValue>`;
+- union type `NewsApiResponse = ISourcesResponse | IArticlesResponse`;
+- generics — `Loader.getResp<TResponse>()` and `Loader.request<TResponse>()`;
+- utility types — `Partial<QueryParams>`, `Pick<IArticle, 'url' | 'title'>`, `Readonly<ILoaderOptions>`;
+- classes with `private`/`public` modifiers — `Loader`, `AppLoader`, `AppController`, `AppView`, `News`, `Sources`, `App`;
+- no `any` anywhere: the `fetch` payload is typed as `unknown` and narrowed to `TResponse`.
 
-## Структура
+## Project structure
 
 ```
 src/
 ├── components/
-│   ├── app/app.ts                   # точка входу UI
+│   ├── app/app.ts                   # UI bootstrap
 │   ├── controller/
-│   │   ├── loader.ts                # типізована обгортка fetch
-│   │   ├── appLoader.ts             # базовий url + режим live/mock
-│   │   └── controller.ts            # запити sources / everything
+│   │   ├── loader.ts                # typed fetch wrapper
+│   │   ├── appLoader.ts             # base url + live/mock mode
+│   │   └── controller.ts            # sources / everything requests
 │   └── view/
-│       ├── appView.ts               # фасад подання
-│       ├── news/news.ts|css         # картки новин
-│       └── sources/sources.ts|css   # чипси джерел
-├── types/                           # інтерфейси API, типи env і css
-├── utils/dom.ts|format.ts           # DOM-хелпери та форматування дати
+│       ├── appView.ts               # view facade
+│       ├── news/news.ts|css         # news cards
+│       └── sources/sources.ts|css   # source chips
+├── types/                           # API contracts, env and css declarations
+├── utils/dom.ts|format.ts           # DOM helpers and date formatting
 ├── index.ts
 ├── index.html
 └── global.css
 ```
 
-## Дизайн
+## Design
 
-Власне оформлення на основі темної теми: градієнтний фон, скляний хедер,
-чипси джерел зі скролом на вузьких екранах, сітка карток 1 → 2 → 3 колонки
-(320px, 700px, 1200px), skeleton-заглушки під час завантаження та стан
-помилки з кнопкою повтору.
+A custom dark theme: gradient background, glassy sticky header, horizontally
+scrollable source chips on narrow screens, a card grid that goes from one to two
+to three columns (320px, 700px, 1200px), skeleton placeholders while loading and
+an error state with a retry button.
 
-## Деплой
+## Deployment
 
-Жива сторінка: <https://krychvas.github.io/news-JS/>
+Live page: <https://krychvas.github.io/news-JS/>
 
 ```bash
 npm run build
 npx gh-pages -d dist -m "deploy: publish production build to gh-pages"
 ```
 
-Збірка використовує `API_USE_MOCKS` зі свого `.env`, тому перед деплоєм
-перевірте режим API.
+The build inlines the `API_USE_MOCKS` value from your `.env`, so check the API
+mode before deploying.
 
-## Автор
+## Author
 
 [Aleh Serhiyenia](https://github.com/KrychVas) · [RS School](https://rs.school/courses/javascript)
