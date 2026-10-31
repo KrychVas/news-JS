@@ -75,9 +75,13 @@
 }
 
 .sources__status {
+    flex: 1 1 100%;
+    min-width: 0;
     padding: 11px 4px;
     color: var(--color-text-muted);
     font-size: 14px;
+    overflow-wrap: anywhere;
+    white-space: normal;
 }
 
 .sources__status--error {
