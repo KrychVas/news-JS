@@ -1,34 +1,86 @@
 .sources {
     display: flex;
     flex-wrap: nowrap;
-    width: 100%;
-    height: 120px;
-    overflow: auto;
-    align-items: center;
-    font: 300 1em 'Fira Sans', sans-serif;
+    gap: 10px;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding: 2px 2px 14px;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+
+.sources::-webkit-scrollbar {
+    height: 6px;
+}
+
+.sources::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sources::-webkit-scrollbar-thumb {
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.18);
 }
 
 .source__item {
-    background: none;
-    border: 2px solid #30c5ff;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding: 10px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    color: #cbd5e1;
     font: inherit;
+    font-size: 13px;
+    font-weight: 600;
     line-height: 1;
-    margin: 0.5em;
-    padding: 1em 2em;
-    color: #70d6ff;
-    transition: 0.25s;
     cursor: pointer;
+    transition:
+        color var(--transition),
+        border-color var(--transition),
+        background-color var(--transition),
+        transform var(--transition);
 }
 
-.source__item:hover,
-.source__item:focus {
-    border-color: #3fcc59;
-    color: #69db7e;
-    box-shadow: 0 0.5em 0.5em -0.4em #3fcc59;
-    transform: translateY(-0.25em);
+.source__item:hover {
+    border-color: rgba(56, 189, 248, 0.5);
+    background: var(--color-surface-hover);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.source__item:focus-visible {
+    outline: 2px solid var(--color-accent-soft);
+    outline-offset: 2px;
+}
+
+.source__item--active {
+    border-color: var(--color-accent);
+    background: linear-gradient(135deg, rgba(90, 214, 125, 0.22), rgba(56, 189, 248, 0.18));
+    color: var(--color-accent);
+}
+
+.source__item--active:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
 }
 
 .source__item-name {
-    font-weight: 400;
     white-space: nowrap;
+}
+
+.sources__status {
+    padding: 11px 4px;
+    color: var(--color-text-muted);
+    font-size: 14px;
+}
+
+.sources__status--error {
+    color: #fca5a5;
+    overflow-wrap: anywhere;
 }
