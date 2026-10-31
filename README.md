@@ -51,8 +51,13 @@ npm start              # http://localhost:8080
 - `GET /mocks/sources` — фіксований список джерел;
 - `GET /mocks/everything` — фіксований список статей.
 
-Для розробки достатньо `API_USE_MOCKS=true` у `.env`; для деплою — `false`.
-Коли застосунок працює на моках, у хедері показується бейдж **Демо-дані**.
+Для розробки достатньо `API_USE_MOCKS=true` (це значення за замовчуванням у
+`.env.defaults`). Бейдж **Демо-дані** в хедері показує, що застосунок працює на моках.
+
+> **Чому демо задеплоєне на моках.** Живі ендпоінти проксі (`/sources`,
+> `/everything`) без особистого ключа повертають `401 Unauthorized`, а моки —
+> `200` з `Access-Control-Allow-Origin: *`. Щоб побачити справжні новини,
+> впишіть свій ключ у `API_KEY` і встановіть `API_USE_MOCKS=false`.
 
 ## Що є в TypeScript
 
@@ -95,10 +100,15 @@ src/
 
 ## Деплой
 
+Жива сторінка: <https://krychvas.github.io/news-JS/>
+
 ```bash
 npm run build
-npx gh-pages -d dist
+npx gh-pages -d dist -m "deploy: publish production build to gh-pages"
 ```
+
+Збірка використовує `API_USE_MOCKS` зі свого `.env`, тому перед деплоєм
+перевірте режим API.
 
 ## Автор
 
