@@ -52,14 +52,16 @@ The proxy exposes two extra endpoints with static data:
 - `GET /mocks/sources` — a fixed list of sources;
 - `GET /mocks/everything` — a fixed list of articles.
 
-`API_USE_MOCKS=true` is the default: it needs no API key and never consumes the
-request limit. The **Demo data** badge in the header tells you which mode is
-active.
+`API_USE_MOCKS=true` is the committed default: it needs no API key and never
+consumes the request limit. The **Demo data** badge in the header tells you which
+mode is active — with `false` the badge disappears and the app talks to the live
+proxied News API.
 
-> **Why the deployed demo runs on mocks.** The live proxy endpoints (`/sources`,
-> `/everything`) answer `401 Unauthorized` without a personal key, while the
-> mocks answer `200` with `Access-Control-Allow-Origin: *`. To see real news,
-> put your key into `API_KEY` and set `API_USE_MOCKS=false`.
+> **Live vs mock.** Live endpoints (`/sources`, `/everything`) answer
+> `401 Unauthorized` without a personal key, so the deployed build sets
+> `API_USE_MOCKS=false` and ships a personal `API_KEY`. Note that
+> `dotenv-webpack` inlines that key into the public bundle — acceptable for the
+> free News API plan, but do not put a paid key there.
 
 ## TypeScript highlights
 
