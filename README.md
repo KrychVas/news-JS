@@ -114,4 +114,4 @@ mode before deploying.
 
 ## Author
 
-[Aleh Serhiyenia](https://github.com/KrychVas) · [RS School](https://rs.school/courses/javascript)
+[Vasyl Krychfalushii](https://github.com/KrychVas) · [RS School tasks](https://github.com/rolling-scopes-school/tasks/blob/master/fullstack-engineering/tasks/TS-news-api/migration-newip-to-ts.md)
