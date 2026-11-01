@@ -92,6 +92,24 @@ The worker forwards `/sources` and `/everything` to News API with the secret key
 and also serves `/mocks/*`, so the automatic fallback keeps working. After that
 no key exists in the bundle.
 
+The same proxy is available as a Netlify Edge Function in
+[`netlify/edge-functions/news-proxy.js`](netlify/edge-functions/news-proxy.js),
+mounted on `/api/*`:
+
+```bash
+npm i -g netlify-cli
+netlify login
+netlify sites:create --name krychvas-news-api
+netlify link --name krychvas-news-api
+netlify env:set NEWS_API_KEY <your key>
+npm run build
+netlify deploy --prod
+```
+
+Then point the app at `https://<your-site>.netlify.app/api/` with an empty
+`API_KEY`. Edge functions are deployed by the CLI or a Git integration, not by
+drag and drop.
+
 ## TypeScript highlights
 
 - `enum` — `Endpoint`, `HttpMethod`, `ResponseStatus`, `ApiMode` (`src/types/api.ts`);
