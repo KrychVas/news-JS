@@ -166,13 +166,24 @@ body {
 
 .footer__inner {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px 16px;
+    gap: 8px;
     max-width: var(--container);
     margin: 0 auto;
     padding: 18px clamp(16px, 4vw, 40px);
+}
+
+.footer__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px 18px;
+}
+
+.footer__row--course {
+    padding-top: 6px;
 }
 
 .footer__link {
@@ -211,8 +222,8 @@ body {
 }
 
 .footer__logo {
-    width: 24px;
-    height: 24px;
+    width: 34px;
+    height: 34px;
     flex: 0 0 auto;
 }
 
