@@ -1,0 +1,3 @@
+# Worker dependencies
+worker/node_modules
+.wrangler

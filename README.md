@@ -58,15 +58,39 @@ mode is active — with `false` the badge disappears and the app talks to the li
 proxied News API.
 
 > **Live vs mock.** Live endpoints (`/sources`, `/everything`) answer
-> `401 Unauthorized` without a personal key, so the deployed build sets
-> `API_USE_MOCKS=false` and ships a personal `API_KEY`. Note that
-> `dotenv-webpack` inlines that key into the public bundle — acceptable for the
-> free News API plan, but do not put a paid key there.
+> `401 Unauthorized` without a personal key, so the deployed build needs
+> `API_USE_MOCKS=false` plus a key. `dotenv-webpack` inlines that key into the
+> public bundle, so for a private key use the worker described below.
 >
 > **Automatic fallback.** In live mode the mock url is kept as a secondary
 > endpoint. When a live request fails — exhausted daily quota (`429`), rejected
 > key (`401`) or a network error — the very same request is retried against
 > `/mocks/*` and the **Demo data** badge appears, so the page never breaks.
+
+### Keeping the API key private
+
+Everything that reaches the browser is visible, so a key inlined by
+`dotenv-webpack` must be treated as public. For a live demo with a private key,
+deploy the Cloudflare Worker from [`worker/`](worker) and point the app at it:
+
+```bash
+npm i -g wrangler
+wrangler login
+cd worker
+wrangler secret put NEWS_API_KEY   # asked once, then stored on the server
+wrangler deploy
+```
+
+Then in `.env`:
+
+```
+API_URL=https://news-api-proxy.<your-subdomain>.workers.dev/
+API_KEY=
+```
+
+The worker forwards `/sources` and `/everything` to News API with the secret key
+and also serves `/mocks/*`, so the automatic fallback keeps working. After that
+no key exists in the bundle.
 
 ## TypeScript highlights
 
