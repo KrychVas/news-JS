@@ -1,0 +1,6 @@
+[build]
+    command = "npm run build"
+    publish = "dist"
+
+# The edge function is picked up from `netlify/edge-functions/` and mounts
+# itself on `/api/*` through its `config` export.
