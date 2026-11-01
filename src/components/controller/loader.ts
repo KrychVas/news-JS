@@ -13,6 +13,8 @@ class Loader {
     private readonly fallbackBaseUrl: Maybe<string>;
     private readonly onFallback: Maybe<() => void>;
     private readonly defaultQuery: Readonly<QueryParams>;
+    /** Once the fallback worked, every next request goes straight to the mocks. */
+    private fallbackActive = false;
 
     public constructor({ baseUrl, apiKey, fallbackBaseUrl = null, onFallback }: Readonly<ILoaderOptions>) {
         this.baseUrl = baseUrl;
@@ -50,6 +52,10 @@ class Loader {
      * repeated against the mock endpoint, so the interface keeps working.
      */
     private async requestWithFallback<TResponse>(endpoint: Endpoint, query: Partial<QueryParams>): Promise<TResponse> {
+        if (this.fallbackActive && this.fallbackBaseUrl !== null) {
+            return this.request<TResponse>(this.fallbackBaseUrl, endpoint, query);
+        }
+
         try {
             return await this.request<TResponse>(this.baseUrl, endpoint, query);
         } catch (error: unknown) {
@@ -58,6 +64,7 @@ class Loader {
             }
 
             console.warn(`Primary API failed, switching to mock data: ${Loader.describeError(error)}`);
+            this.fallbackActive = true;
             this.onFallback?.();
 
             return this.request<TResponse>(this.fallbackBaseUrl, endpoint, query);
