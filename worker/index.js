@@ -14,7 +14,7 @@
  */
 
 const NEWS_API_UPSTREAM = 'https://newsapi.org/v2/';
-const MOCK_UPSTREAM = 'https://rss-news-api.onrender.com/mocks/';
+const MOCK_UPSTREAM = 'https://rss-news-api.onrender.com/';
 const LIVE_ENDPOINTS = new Set(['sources', 'everything']);
 
 const CORS_HEADERS = {

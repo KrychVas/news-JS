@@ -1,3 +1,4 @@
-# Worker dependencies
+# Worker dependencies and local secrets
 worker/node_modules
 .wrangler
+.dev.vars
