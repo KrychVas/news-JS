@@ -4,9 +4,12 @@ import AppView from '../view/appView';
 import { getElement } from '../../utils/dom';
 
 class App {
+    private static readonly AUTO_PROBE_LIMIT = 4;
+
     private readonly controller: AppController;
     private readonly view: AppView;
     private activeSourceId: string | null = null;
+    private sourceIds: readonly string[] = [];
 
     public constructor() {
         this.view = new AppView(AppController.mode);
@@ -66,17 +69,48 @@ class App {
         this.controller.getSources(
             (response: ISourcesResponse): void => {
                 this.view.drawSources(response);
-
-                const firstSource: ISource | undefined = response.sources[0];
-
-                if (firstSource !== undefined) {
-                    this.activeSourceId = firstSource.id;
-                    this.view.setActiveSource(firstSource.id);
-                    this.loadNews(firstSource.id);
-                }
+                this.sourceIds = response.sources.map((source: ISource) => source.id);
+                this.autoSelectSource(0);
             },
             (message: string): void => {
                 this.view.showSourcesError(message);
+                this.view.showNewsError(message);
+            }
+        );
+    }
+
+    /**
+     * Some sources legitimately return zero articles (for example `abc-news`
+     * on the live API), so the first source with actual news is selected
+     * instead of showing an empty page. Gives up after `AUTO_PROBE_LIMIT` tries.
+     */
+    private autoSelectSource(index: number): void {
+        const sourceId: string | undefined = this.sourceIds[index];
+
+        if (sourceId === undefined || index >= App.AUTO_PROBE_LIMIT) {
+            return;
+        }
+
+        this.activeSourceId = sourceId;
+        this.view.setActiveSource(sourceId);
+        this.view.showNewsLoading();
+
+        this.controller.getNews(
+            sourceId,
+            (response: IArticlesResponse): void => {
+                if (this.activeSourceId !== sourceId) {
+                    return;
+                }
+
+                if (response.articles.length === 0) {
+                    this.autoSelectSource(index + 1);
+
+                    return;
+                }
+
+                this.view.drawNews(response);
+            },
+            (message: string): void => {
                 this.view.showNewsError(message);
             }
         );
