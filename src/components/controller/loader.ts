@@ -1,4 +1,4 @@
-import type { Callback, ErrorCallback, ILoaderOptions, IRequestParameters, QueryParams } from '../../types/api';
+import type { Callback, ErrorCallback, ILoaderOptions, IRequestParameters, Maybe, QueryParams } from '../../types/api';
 import { Endpoint, HttpMethod } from '../../types/api';
 
 /**
@@ -10,11 +10,15 @@ class Loader {
     private static readonly NOT_FOUND_MESSAGE = 'The requested resource was not found on the News API server.';
 
     private readonly baseUrl: string;
+    private readonly fallbackBaseUrl: Maybe<string>;
+    private readonly onFallback: Maybe<() => void>;
     private readonly defaultQuery: Readonly<QueryParams>;
 
-    public constructor({ baseUrl, apiKey }: Readonly<ILoaderOptions>) {
+    public constructor({ baseUrl, apiKey, fallbackBaseUrl = null, onFallback }: Readonly<ILoaderOptions>) {
         this.baseUrl = baseUrl;
         this.defaultQuery = { apiKey };
+        this.fallbackBaseUrl = fallbackBaseUrl;
+        this.onFallback = onFallback ?? null;
     }
 
     /**
@@ -26,7 +30,7 @@ class Loader {
         callback: Callback<TResponse>,
         onError?: ErrorCallback
     ): void {
-        void this.request<TResponse>(endpoint, query)
+        void this.requestWithFallback<TResponse>(endpoint, query)
             .then((payload: TResponse) => {
                 callback(payload);
             })
@@ -40,8 +44,32 @@ class Loader {
             });
     }
 
-    private async request<TResponse>(endpoint: Endpoint, query: Partial<QueryParams>): Promise<TResponse> {
-        const response: Response = await fetch(this.buildUrl(endpoint, query), { method: HttpMethod.Get });
+    /**
+     * Tries the primary endpoint first. When it fails — exhausted request
+     * quota, rejected key or a network error — the very same request is
+     * repeated against the mock endpoint, so the interface keeps working.
+     */
+    private async requestWithFallback<TResponse>(endpoint: Endpoint, query: Partial<QueryParams>): Promise<TResponse> {
+        try {
+            return await this.request<TResponse>(this.baseUrl, endpoint, query);
+        } catch (error: unknown) {
+            if (this.fallbackBaseUrl === null) {
+                throw error;
+            }
+
+            console.warn(`Primary API failed, switching to mock data: ${Loader.describeError(error)}`);
+            this.onFallback?.();
+
+            return this.request<TResponse>(this.fallbackBaseUrl, endpoint, query);
+        }
+    }
+
+    private async request<TResponse>(
+        baseUrl: string,
+        endpoint: Endpoint,
+        query: Partial<QueryParams>
+    ): Promise<TResponse> {
+        const response: Response = await fetch(this.buildUrl(baseUrl, endpoint, query), { method: HttpMethod.Get });
 
         Loader.assertSuccessful(response);
 
@@ -50,7 +78,7 @@ class Loader {
         return payload as TResponse;
     }
 
-    private buildUrl(endpoint: Endpoint, query: Partial<QueryParams>): string {
+    private buildUrl(baseUrl: string, endpoint: Endpoint, query: Partial<QueryParams>): string {
         const search: URLSearchParams = new URLSearchParams();
         const mergedQuery: Partial<QueryParams> = { ...this.defaultQuery, ...query };
 
@@ -62,7 +90,7 @@ class Loader {
 
         const queryString = search.toString();
 
-        return queryString === '' ? `${this.baseUrl}${endpoint}` : `${this.baseUrl}${endpoint}?${queryString}`;
+        return queryString === '' ? `${baseUrl}${endpoint}` : `${baseUrl}${endpoint}?${queryString}`;
     }
 
     private static assertSuccessful(response: Response): void {

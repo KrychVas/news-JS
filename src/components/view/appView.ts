@@ -11,7 +11,10 @@ export class AppView {
     public constructor(mode: ApiMode) {
         this.news = new News();
         this.sources = new Sources();
-        this.markApiMode(mode);
+
+        if (mode === ApiMode.Mock) {
+            this.markDemoMode();
+        }
     }
 
     public drawSources(response: ISourcesResponse): void {
@@ -42,12 +45,11 @@ export class AppView {
         this.news.showError(message);
     }
 
-    /** Makes it obvious that the application runs on the static mock responses. */
-    private markApiMode(mode: ApiMode): void {
-        if (mode !== ApiMode.Mock) {
-            return;
-        }
-
+    /**
+     * Makes it obvious that the application runs on the static mock responses.
+     * Public, because the loader calls it when the live request quota is gone.
+     */
+    public markDemoMode(): void {
         const badge: HTMLElement = getElement<HTMLElement>('.header__badge');
         badge.hidden = false;
         badge.textContent = 'Demo data';

@@ -9,8 +9,10 @@ class App {
     private activeSourceId: string | null = null;
 
     public constructor() {
-        this.controller = new AppController();
         this.view = new AppView(AppController.mode);
+        this.controller = new AppController(() => {
+            this.view.markDemoMode();
+        });
     }
 
     public start(): void {

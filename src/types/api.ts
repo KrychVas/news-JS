@@ -88,4 +88,8 @@ export interface IRequestParameters {
 export interface ILoaderOptions {
     readonly baseUrl: string;
     readonly apiKey: string;
+    /** Used when the primary endpoint fails: exhausted quota, 401 or network error. */
+    readonly fallbackBaseUrl?: Maybe<string>;
+    /** Called once, right before the fallback request is sent. */
+    readonly onFallback?: () => void;
 }

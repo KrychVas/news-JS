@@ -62,6 +62,11 @@ proxied News API.
 > `API_USE_MOCKS=false` and ships a personal `API_KEY`. Note that
 > `dotenv-webpack` inlines that key into the public bundle — acceptable for the
 > free News API plan, but do not put a paid key there.
+>
+> **Automatic fallback.** In live mode the mock url is kept as a secondary
+> endpoint. When a live request fails — exhausted daily quota (`429`), rejected
+> key (`401`) or a network error — the very same request is retried against
+> `/mocks/*` and the **Demo data** badge appears, so the page never breaks.
 
 ## TypeScript highlights
 
